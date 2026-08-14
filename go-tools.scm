@@ -998,13 +998,14 @@
                      (gt-get res 'modules '())))
        (let ([n (length *gm-modules*)]
              [u (length (gm-updatable))]
-             [checked? (gt-get res 'updates_checked #f)])
+             [checked? (gt-get res 'updates_checked #f)]
+             [note (gt-get res 'note "")])
          (set! *gm-cursor* (min *gm-cursor* (max 0 (- n 1))))
          (set! *gm-status*
                (string-append (to-string n) " dependencies — "
-                              (if checked?
-                                  (string-append (to-string u) " update(s) available")
-                                  "updates unknown (offline?)"))))))
+                              (cond [checked? (string-append (to-string u) " update(s) available")]
+                                    [(> (string-length note) 0) (gt-truncate note 60)]
+                                    [else "updates unknown (offline?)"]))))))
    (lambda (msg)
      (set! *gm-busy* #f)
      (set! *gm-status* (string-append "error: " msg)))))

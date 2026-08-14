@@ -170,7 +170,11 @@ dependency-free Go program) which prints one JSON object per invocation:
 - `impl` resolves interfaces through `go list -export` + the stdlib `gc` importer,
   so it works offline for anything already in the build cache.
 - `gotests` builds skeletons from the function's AST.
-- `mod` wraps `go list -m -u -json all`, `go get`, and `go mod tidy`.
+- `mod` wraps `go list -m -u -json all`, `go get`, and `go mod tidy`. Vendored
+  projects are handled: `-mod=mod` bypasses the "can't compute 'all' using the
+  vendor directory" restriction, `vendor/` is re-synced after anything that
+  rewrites `go.mod`, and `vendor/modules.txt` is the fallback when the module
+  graph can't be resolved at all (fully offline).
 
 ## Notes and caveats
 
@@ -182,6 +186,8 @@ dependency-free Go program) which prints one JSON object per invocation:
   them from the same buffer they were applied to.
 - Update checks in the go.mod panel need network access; offline, the panel still
   lists dependencies and says "updates unknown".
+- In vendored projects, `u`/`U`/`t` run `go mod vendor` afterwards so `vendor/`
+  never silently goes stale.
 
 ## Requirements
 
