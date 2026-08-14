@@ -85,6 +85,9 @@ that only exist in `.go` files:
                 (C-y ":go-test-panel")))    ; Ctrl-y: results panel
 ```
 
+> **Warning:** Do **not** bind `(space ...)` inside `(keymap (extension "go") ...)`. In Helix, defining `space` in an extension-scoped keymap completely shadows Helix's default `space` leader keymap for `.go` files, disabling Helix's popup menu and built-in shortcuts (`space f`, `space b`, etc.). Always use `(keymap (global) ...)` when defining `space` leader keys.
+
+
 **Minimal, tests only:**
 
 ```scheme
