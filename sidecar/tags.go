@@ -114,7 +114,7 @@ func cmdTags(argv []string) error {
 	if err == nil {
 		mode = info.Mode()
 	}
-	if err := os.WriteFile(*file, formatted, mode); err != nil {
+	if err := writeFileAtomic(*file, formatted, mode); err != nil {
 		return err
 	}
 	emit(map[string]any{"ok": true, "fields": changed})

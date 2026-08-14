@@ -80,7 +80,7 @@ func cmdGotests(argv []string) error {
 	if err != nil {
 		formatted = content // still write it; user can fix by hand
 	}
-	if err := os.WriteFile(testFile, formatted, 0o644); err != nil {
+	if err := writeFileAtomic(testFile, formatted, 0o644); err != nil {
 		return err
 	}
 	emit(map[string]any{"test_file": testFile, "test_name": testName, "line": insertLine, "already": false})

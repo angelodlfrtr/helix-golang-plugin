@@ -53,7 +53,7 @@ type testRunResult struct {
 	CoverProfile string        `json:"cover_profile,omitempty"`
 }
 
-var failLocRe = regexp.MustCompile(`(?m)^\s+([\w./\\-]+\.go):(\d+):`)
+var failLocRe = regexp.MustCompile(`(?m)^\s+((?:[a-zA-Z]:)?[^\s:]+\.go):(\d+):`)
 
 // noiseLine matches test2json framing we do not want in captured output.
 var noiseLine = regexp.MustCompile(`^(=== (RUN|PAUSE|CONT|NAME)|--- (PASS|FAIL|SKIP)|PASS$|FAIL$|ok\s|FAIL\s)`)

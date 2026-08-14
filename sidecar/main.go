@@ -7,11 +7,13 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 )
 
 func main() {
@@ -55,14 +57,43 @@ func fail(msg string) {
 	os.Exit(0)
 }
 
-// runGo runs the go tool in dir and returns stdout / stderr.
+// runGo runs the go tool in dir with a 10-minute timeout and returns stdout / stderr.
 func runGo(dir string, args ...string) (string, string, error) {
-	cmd := exec.Command("go", args...)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "go", args...)
 	cmd.Dir = dir
 	var out, errb bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &out, &errb
 	err := cmd.Run()
 	return out.String(), errb.String(), err
+}
+
+// writeFileAtomic writes data to a temporary file in target's directory, then renames it over target.
+func writeFileAtomic(target string, data []byte, mode os.FileMode) error {
+	dir := filepath.Dir(target)
+	tmp, err := os.CreateTemp(dir, ".hx-go-tmp-*")
+	if err != nil {
+		return err
+	}
+	tmpName := tmp.Name()
+	defer func() {
+		_ = os.Remove(tmpName) // no-op if successfully renamed
+	}()
+
+	if _, err := tmp.Write(data); err != nil {
+		tmp.Close()
+		return err
+	}
+	if err := tmp.Chmod(mode); err != nil {
+		tmp.Close()
+		return err
+	}
+	if err := tmp.Close(); err != nil {
+		return err
+	}
+
+	return os.Rename(tmpName, target)
 }
 
 // findModuleRoot walks up from dir looking for go.mod.

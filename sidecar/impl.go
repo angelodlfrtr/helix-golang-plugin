@@ -120,6 +120,9 @@ func receiverBaseType(recv string) string {
 	}
 	t := fields[len(fields)-1]
 	t = strings.TrimPrefix(t, "*")
+	if idx := strings.IndexByte(t, '['); idx >= 0 {
+		t = t[:idx]
+	}
 	if t == "" || !isIdent(t) {
 		return ""
 	}
